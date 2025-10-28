@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using TaskManagementAPI.Data;
+using TaskManagementAPI.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,15 +26,28 @@ builder.Services.AddCors(options =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDataContext>(options =>
     options.UseNpgsql(connectionString));
-
+builder.Services.AddScoped<ITaskManagementService, TaskManagementService>();
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "TaskManagement API V1");
+        c.RoutePrefix = string.Empty;
+    });
 }
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
+
 
 app.UseHttpsRedirection();
 
