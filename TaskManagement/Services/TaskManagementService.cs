@@ -11,6 +11,7 @@ namespace TaskManagementAPI.Data.Repositories
     public interface ITaskManagementService
     {
         public Task<IEnumerable<TasksCreateModel>> GetAllAsync();
+        public Task<IEnumerable<TasksCreateModel>> GetByUserIdAsync(Guid userId);
         public Task<TasksCreateModel?> GetByIdAsync(Guid id);
         public Task<TasksCreateModel> CreateAsync(TasksCreateModel task);
         public Task<TaskViewModel?> UpdateAsync(UpdateTaskModel task);
@@ -49,6 +50,17 @@ namespace TaskManagementAPI.Data.Repositories
             }
 
 
+        }
+
+        public async Task<IEnumerable<TasksCreateModel>> GetByUserIdAsync(Guid userId)
+        {
+            // stored UserId in Tasks table is text (Guid stored as string)
+            var uid = userId.ToString();
+            return await _context.Tasks
+                .AsNoTracking()
+                .Where(t => t.UserId == uid)
+                .OrderByDescending(t => t.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<TasksCreateModel> CreateAsync(TasksCreateModel CreateTaskModel)

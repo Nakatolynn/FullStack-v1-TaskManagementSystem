@@ -23,6 +23,10 @@ namespace TaskManagementAPI.TaskManagement.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedAt { get; set; }
+        
+        // stored as text in DB (migration created UserId as text)
+        [MaxLength(100)]
+        public string? UserId { get; set; }
 
     }
 
@@ -53,6 +57,7 @@ namespace TaskManagementAPI.TaskManagement.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+        public string? UserId { get; set; }
     }
     public class TaskViewModel
     {
@@ -62,6 +67,7 @@ namespace TaskManagementAPI.TaskManagement.Models
         public TaskStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public string? UserId { get; set; }
     }
 
 }

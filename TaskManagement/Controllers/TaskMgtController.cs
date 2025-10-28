@@ -34,6 +34,16 @@ namespace TaskManagementAPI.Controllers
             return Ok(task);
         }
 
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetTasksByUser(string userId)
+        {
+            if (!Guid.TryParse(userId, out Guid uid))
+                return BadRequest("Invalid GUID format for userId.");
+
+            var tasks = await _taskService.GetByUserIdAsync(uid);
+            return Ok(tasks);
+        }
+
 
         [HttpPost("create-task")]
         public async Task<IActionResult> CreateTask([FromBody] TasksCreateModel model)

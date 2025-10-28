@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using TaskManagement.Auth;
 var builder = WebApplication.CreateBuilder(args);
 
 // Services
@@ -70,6 +71,8 @@ builder.Services.AddAuthorization();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDataContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddScoped<ITaskManagementService, TaskManagementService>();
+// Auth service
+builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();
 
