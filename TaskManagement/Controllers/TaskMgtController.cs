@@ -21,16 +21,19 @@ namespace TaskManagementAPI.Controllers
             var tasks = await _taskService.GetAllAsync();
             return Ok(tasks);
         }
-
-        [HttpGet("get-task-by-id/{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        [HttpGet("get-task-by-id")]
+        public async Task<IActionResult> GetById(string id)
         {
-            var task = await _taskService.GetByIdAsync(id);
+            if (!Guid.TryParse(id, out Guid taskId))
+                return BadRequest("Invalid GUID format for id.");
+
+            var task = await _taskService.GetByIdAsync(taskId);
             if (task == null)
                 return NotFound();
 
             return Ok(task);
         }
+
 
         [HttpPost("create-task")]
         public async Task<IActionResult> CreateTask([FromBody] TasksCreateModel model)
