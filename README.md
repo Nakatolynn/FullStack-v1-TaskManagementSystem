@@ -60,16 +60,17 @@ Used Loggers to show the status of the applications when its running.
 
 ### Running the project
 
-Default mode
-
-```
+dotnet run
 dotnet run --project TaskManagementAPI
+
 ```
 
 Running in watch mode
 
 ```
+
 dotnet watch --project TaskManagementAPI
+
 ```
 
 ### Database setup
@@ -82,7 +83,9 @@ dotnet dev-certs https --trust
 Remove a migration
 
 ```
+
 dotnet ef migrations remove --project TaskManagementAPI
 
+```
 
 ```
