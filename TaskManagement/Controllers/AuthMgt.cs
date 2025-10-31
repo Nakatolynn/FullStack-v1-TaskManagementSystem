@@ -36,7 +36,7 @@ public class AuthManagementController : ControllerBase
         return Ok(new { token });
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("get-user-details-by-userId/{id}")]
     public async Task<IActionResult> GetUserById(string id)
     {
         if (!Guid.TryParse(id, out var guid))
@@ -47,4 +47,5 @@ public class AuthManagementController : ControllerBase
             return NotFound();
         return Ok(new { user.UserId, user.Username, user.FirstName, user.LastName });
     }
+
 }
