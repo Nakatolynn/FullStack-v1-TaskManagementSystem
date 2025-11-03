@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TaskManagement.Auth;
+using TaskManagement.AuthModels;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -30,11 +31,13 @@ public class AuthManagementController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginModel model)
     {
-        var token = _authService.Login(model);
-        if (token == null)
-            return Unauthorized("Invalid credentials");
-        return Ok(new { token });
+        var loginResponse = _authService.Login(model);
+        if (loginResponse == null)
+            return Unauthorized("Invalid username or password");
+
+        return Ok(loginResponse);
     }
+
 
     [HttpGet("get-user-details-by-userId/{id}")]
     public async Task<IActionResult> GetUserById(string id)

@@ -30,7 +30,6 @@ namespace TaskManagementAPI.Data.Repositories
             return await _context.Tasks
                 .Where(t => t.ParentTaskId == null)
                 .AsNoTracking()
-                .Include(t => t.ParentTask)
                 .OrderByDescending(t => t.CreatedAt)
                 .Select(t => new TasksCreateModel
                 {
@@ -58,6 +57,7 @@ namespace TaskManagementAPI.Data.Repositories
                 })
                 .ToListAsync();
         }
+
 
         public async Task<TasksCreateModel?> GetTaskById(Guid id)
         {
@@ -132,10 +132,14 @@ namespace TaskManagementAPI.Data.Repositories
             {
                 if (createTaskModel.TaskId == Guid.Empty)
                     createTaskModel.TaskId = Guid.NewGuid();
-
                 createTaskModel.CreatedAt = DateTime.UtcNow;
+                createTaskModel.DueDate = createTaskModel.DueDate?.ToUniversalTime();
+                createTaskModel.SubmissionDate = createTaskModel.SubmissionDate?.ToUniversalTime();
+                createTaskModel.ReviewDate = createTaskModel.ReviewDate?.ToUniversalTime();
+                createTaskModel.CompletionDate = createTaskModel.CompletionDate?.ToUniversalTime();
 
                 List<TasksCreateModel> savedSubTasks = new List<TasksCreateModel>();
+
                 if (createTaskModel.SubTasks != null && createTaskModel.SubTasks.Any())
                 {
                     foreach (var subtask in createTaskModel.SubTasks)
@@ -147,10 +151,13 @@ namespace TaskManagementAPI.Data.Repositories
                             Description = subtask.Description,
                             CreatedByUser = subtask.CreatedByUserName,
                             UserId = subtask.UserId,
-                            DueDate = subtask.DueDate,
                             ParentTaskId = createTaskModel.TaskId,
+                            Status = subtask.Status,
+                            DueDate = subtask.DueDate?.ToUniversalTime(),
                             CreatedAt = DateTime.UtcNow,
-                            Status = subtask.Status
+                            SubmissionDate = subtask.SubmissionDate?.ToUniversalTime(),
+                            ReviewDate = subtask.ReviewDate?.ToUniversalTime(),
+                            CompletionDate = subtask.CompletionDate?.ToUniversalTime()
                         };
 
                         _context.Tasks.Add(subTask);
@@ -183,6 +190,7 @@ namespace TaskManagementAPI.Data.Repositories
                 throw new ApplicationException("An unexpected error occurred while creating tasks.", ex);
             }
         }
+
 
         // public async Task<TaskViewModel?> UpdateTask(UpdateTaskModel updateTaskModel)
         // {

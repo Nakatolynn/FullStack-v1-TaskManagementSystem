@@ -5,6 +5,7 @@ using System.Text;
 using TaskManagementAPI.Data;
 using TaskManagementAPI.User;
 using Microsoft.EntityFrameworkCore;
+using TaskManagement.AuthModels;
 
 namespace TaskManagement.Auth;
 
@@ -37,29 +38,37 @@ public class AuthService
         return user;
     }
 
-    public string? Login(LoginModel model)
-    {
-        var user = _context.Users.FirstOrDefault(u => u.Username == model.Username);
-        if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
-            return null;
+ public LoginResponse? Login(LoginModel model)
+{
+    var user = _context.Users.FirstOrDefault(u => u.Username == model.Username);
+    if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+        return null;
 
-        var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var tokenDescriptor = new SecurityTokenDescriptor
+    var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
+    var tokenHandler = new JwtSecurityTokenHandler();
+    var tokenDescriptor = new SecurityTokenDescriptor
+    {
+        Subject = new ClaimsIdentity(new[]
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim("UserId", user.UserId.ToString()),
-                new Claim(ClaimTypes.Name, user.Username)
-            }),
-            Expires = DateTime.UtcNow.AddMinutes(30),
-            SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
-        };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
-    }
+            new Claim("UserId", user.UserId.ToString()),
+            new Claim(ClaimTypes.Name, user.Username)
+        }),
+        Expires = DateTime.UtcNow.AddMinutes(30),
+        SigningCredentials = new SigningCredentials(
+            new SymmetricSecurityKey(key),
+            SecurityAlgorithms.HmacSha256Signature)
+    };
+
+    var token = tokenHandler.CreateToken(tokenDescriptor);
+
+    return new LoginResponse
+    {
+        Token = tokenHandler.WriteToken(token),
+        UserId = user.UserId,
+        Username = user.Username
+    };
+}
+
 
     public async Task<Users?> GetUserByIdAsync(Guid userId)
     {
@@ -67,4 +76,5 @@ public class AuthService
             return null;
         return await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
     }
+
 }

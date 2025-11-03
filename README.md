@@ -53,10 +53,9 @@ Used Loggers to show the status of the applications when its running.
 - AspNetCore Identity EntityFramework
 - AspNetCore HealthChecks EntityFrameworkCore
 - Microsoft IdentityModel Tokens
-- AspNetCore HealthChecks (SQL Server)
 - AspNetCore Authentication JWT Bearer
 - Newtonsoft Json
-- Serilog AspNetCore, Console, File
+-Console, File
 
 ### Running the project
 

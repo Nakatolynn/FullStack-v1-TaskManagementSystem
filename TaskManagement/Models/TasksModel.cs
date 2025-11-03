@@ -37,8 +37,8 @@ namespace TaskManagementAPI.TaskManagement.Models
 
         public Guid? ParentTaskId { get; set; }
 
-        [ForeignKey("ParentTaskId")]
-        public TasksCreateModel? ParentTask { get; set; }
+        // [ForeignKey("ParentTaskId")]
+        // public TasksCreateModel? ParentTask { get; set; }
         [NotMapped]
         public List<TaskViewModel>? SubTasks { get; set; }
     }

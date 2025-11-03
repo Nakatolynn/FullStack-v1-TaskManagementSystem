@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace TaskManagement.Auth;
+namespace TaskManagement.AuthModels;
 
 public class LoginModel
 {
