@@ -257,11 +257,11 @@ namespace TaskManagementAPI.Data.Repositories
                 originalTask.Description = updateTaskModel.Description;
                 originalTask.Status = updateTaskModel.Status;
                 originalTask.UpdatedAt = DateTime.UtcNow;
-                originalTask.DueDate = updateTaskModel.DueDate;
-                originalTask.SubmissionDate = updateTaskModel.SubmissionDate;
-                originalTask.ReviewDate = updateTaskModel.ReviewDate;
-                originalTask.CompletionDate = updateTaskModel.CompletionDate;
-                originalTask.IsComplete = updateTaskModel.IsComplete ?? originalTask.IsComplete;
+                originalTask.DueDate = EnsureUtc(updateTaskModel.DueDate);
+                originalTask.SubmissionDate = EnsureUtc(updateTaskModel.SubmissionDate);
+                originalTask.ReviewDate = EnsureUtc(updateTaskModel.ReviewDate);
+                originalTask.CompletionDate = EnsureUtc(updateTaskModel.CompletionDate);
+
 
                 if (updateTaskModel.ParentTaskId.HasValue)
                 {
@@ -283,6 +283,11 @@ namespace TaskManagementAPI.Data.Repositories
                             subTask.Status = st.Status;
                             subTask.UpdatedAt = DateTime.UtcNow;
                             subTask.ParentTaskId = originalTask.TaskId;
+
+                            subTask.DueDate = EnsureUtc(st.DueDate);
+                            subTask.SubmissionDate = EnsureUtc(st.SubmissionDate);
+                            subTask.ReviewDate = EnsureUtc(st.ReviewDate);
+                            subTask.CompletionDate = EnsureUtc(st.CompletionDate);
                         }
                         else
                         {
@@ -295,7 +300,11 @@ namespace TaskManagementAPI.Data.Repositories
                                 CreatedByUser = st.CreatedByUserName,
                                 Status = st.Status,
                                 ParentTaskId = originalTask.TaskId,
-                                CreatedAt = DateTime.UtcNow
+                                CreatedAt = DateTime.UtcNow,
+                                DueDate = EnsureUtc(st.DueDate),
+                                SubmissionDate = EnsureUtc(st.SubmissionDate),
+                                ReviewDate = EnsureUtc(st.ReviewDate),
+                                CompletionDate = EnsureUtc(st.CompletionDate)
                             });
                         }
                     }
@@ -398,8 +407,6 @@ namespace TaskManagementAPI.Data.Repositories
                 var task = await _context.Tasks.FindAsync(id);
                 if (task == null)
                     return false;
-
-                // Delete sub-tasks first (to maintain referential integrity)
                 var subTasks = _context.Tasks.Where(st => st.ParentTaskId == id);
                 _context.Tasks.RemoveRange(subTasks);
 
@@ -414,6 +421,17 @@ namespace TaskManagementAPI.Data.Repositories
                 throw new ApplicationException("An unexpected error occurred while deleting tasks.", ex);
             }
         }
+
+        private static DateTime? EnsureUtc(DateTime? date)
+        {
+            if (date == null) return null;
+
+            if (date.Value.Kind == DateTimeKind.Utc)
+                return date;
+
+            return DateTime.SpecifyKind(date.Value, DateTimeKind.Utc);
+        }
+
 
     }
 }
