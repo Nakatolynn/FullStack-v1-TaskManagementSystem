@@ -36,9 +36,19 @@ sudo apt install postgresql-client -y
 
 ### Authentication and Authorization
 
-User authentication is done using the login endpoint.
+User authentication is done using the login Enpoint.
+Register User Endpoint allows users to register on the application.
 When a user is authenticated a JWT token with basic user data,a JWT Token is returned.
 Authorization set up has been added to the swagger page. Simply login then click the Authorize icon where you will paste the token.
+
+##### Task Management Road Map
+
+GetAllTasks Endpoint returns all tasks of the application in the DB Context .
+GetTaskByTaskId- Retrieves Task by Task Id
+GetTasksByUserId- Retrievs Tasks of a given User
+CreateTask-Creates new Entities(tasks) that are persisted to the Databases
+UpdateTask-Updates the Entity's Details in the DB Context.
+DeleteTask- Deletes and entity by Id
 
 ### Logging
 
@@ -51,16 +61,17 @@ Used Loggers to show the status of the applications when its running.
 - AspNetCore EntityFrameworkCore SqlServer
 - AspNetCore EntityFrameworkCore Tools
 - AspNetCore Identity EntityFramework
-- AspNetCore HealthChecks EntityFrameworkCore
+<!-- - AspNetCore HealthChecks EntityFrameworkCore -->
 - Microsoft IdentityModel Tokens
 - AspNetCore Authentication JWT Bearer
 - Newtonsoft Json
--Console, File
+  -Console, File
 
 ### Running the project
 
 dotnet run
-dotnet run --project TaskManagementAPI
+
+<!-- dotnet run --project TaskManagementAPI -->
 
 ```
 

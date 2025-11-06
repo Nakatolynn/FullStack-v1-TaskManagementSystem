@@ -130,6 +130,8 @@ namespace TaskManagementAPI.Data.Repositories
 
             try
             {
+                using var transaction = await _context.Database.BeginTransactionAsync();
+
                 if (createTaskModel.TaskId == Guid.Empty)
                     createTaskModel.TaskId = Guid.NewGuid();
                 createTaskModel.CreatedAt = DateTime.UtcNow;
@@ -164,9 +166,11 @@ namespace TaskManagementAPI.Data.Repositories
                         savedSubTasks.Add(subTask);
                     }
                 }
-
                 _context.Tasks.Add(createTaskModel);
+
                 await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
 
                 createTaskModel.SubTasks = savedSubTasks
                     .Select(s => new TaskViewModel
@@ -187,60 +191,12 @@ namespace TaskManagementAPI.Data.Repositories
             catch (Exception ex)
             {
                 _logger.LogError($"{action} - Unexpected Error: {ex.Message}", ex);
+                await _context.Database.RollbackTransactionAsync();
                 throw new ApplicationException("An unexpected error occurred while creating tasks.", ex);
             }
         }
 
 
-        // public async Task<TaskViewModel?> UpdateTask(UpdateTaskModel updateTaskModel)
-        // {
-        //     var action = "ITaskManagementService:UpdatingTask";
-        //     _logger.LogInformation($"{action}- Request Data: {JsonConvert.SerializeObject(updateTaskModel)}");
-
-        //     try
-        //     {
-        //         var originalTask = await _context.Tasks.FirstOrDefaultAsync(c => c.TaskId == updateTaskModel.TaskId);
-        //         if (originalTask == null)
-        //             throw new ArgumentException($"Task with Id {updateTaskModel.TaskId} Not Found");
-
-        //         originalTask.TaskName = updateTaskModel.TaskName;
-        //         originalTask.Description = updateTaskModel.Description;
-        //         originalTask.Status = updateTaskModel.Status;
-        //         originalTask.UpdatedAt = DateTime.UtcNow;
-        //         originalTask.DueDate = updateTaskModel.DueDate;
-        //         originalTask.SubmissionDate = updateTaskModel.SubmissionDate;
-        //         originalTask.ReviewDate = updateTaskModel.ReviewDate;
-        //         originalTask.CompletionDate = updateTaskModel.CompletionDate;
-        //         originalTask.IsComplete = updateTaskModel.IsComplete ?? originalTask.IsComplete;
-        //         originalTask.ParentTaskId = updateTaskModel.ParentTaskId;
-
-
-        //         _context.Tasks.Update(originalTask);
-        //         await _context.SaveChangesAsync();
-
-        //         return new TaskViewModel
-        //         {
-        //             TaskId = originalTask.TaskId,
-        //             TaskName = originalTask.TaskName,
-        //             Description = originalTask.Description,
-        //             Status = originalTask.Status,
-        //             CreatedAt = originalTask.CreatedAt,
-        //             UpdatedAt = originalTask.UpdatedAt,
-        //             DueDate = originalTask.DueDate,
-        //             SubmissionDate = originalTask.SubmissionDate,
-        //             ReviewDate = originalTask.ReviewDate,
-        //             CompletionDate = originalTask.CompletionDate,
-        //             IsComplete = originalTask.IsComplete,
-        //             ParentTaskId = originalTask.ParentTaskId,
-        //             UserId = originalTask.UserId
-        //         };
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError($"{action} - Unexpected Error: {ex.Message}", ex);
-        //         throw new ApplicationException("An unexpected error occurred while updating tasks.", ex);
-        //     }
-        // }
 
         public async Task<TaskViewModel?> UpdateTask(UpdateTaskModel updateTaskModel)
         {

@@ -43,7 +43,7 @@ namespace TaskManagementAPI.Controllers
         }
 
         [HttpGet("get-list-of-users-task-by-userId/{userId}")]
-        public async Task<IActionResult> GetTasksByUser(string userId)
+        public async Task<IActionResult> GetTasksByUserId(string userId)
         {
             if (!Guid.TryParse(userId, out Guid uid))
                 return BadRequest("Invalid GUID format for userId.");
